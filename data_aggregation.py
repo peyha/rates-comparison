@@ -69,6 +69,6 @@ def load_df_all_protocols():
     df_all['daily_rolling_avg'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(24, center=True).mean())
     df_all['weekly_rolling_avg'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(7*24, center=True).mean())
 
-    df_all.dropna(subset=['rate_at_target'], inplace=True)
+    df_all = df_all.dropna(subset=[col for col in df_all.columns if col != 'rate_at_target'])
 
     return df_all
