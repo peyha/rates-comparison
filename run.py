@@ -110,7 +110,8 @@ def update_table(selected_loan_asset, selected_markets):
 def update_heatmap(selected_loan_asset, selected_rate_type, selected_markets):
     if selected_loan_asset and selected_rate_type and selected_markets:
         filtered_df = df_all[(df_all['loan_asset'] == selected_loan_asset) & (df_all['market'].isin(selected_markets))]
-        pivot_df = filtered_df.pivot(index='date', columns='market', values=selected_rate_type)
+        aggregated_df = filtered_df.groupby(['date', 'market'])[selected_rate_type].mean().reset_index()    
+        pivot_df = aggregated_df.pivot(index='date', columns='market', values=selected_rate_type)
         pivot_df = pivot_df.fillna(method='ffill')
 
         def pairwise_corr(df):
