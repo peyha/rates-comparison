@@ -10,10 +10,8 @@ import plotly.graph_objects as go
 from metrics import *
 from data_aggregation import load_df_all_protocols
 
-os.remove('IRM-performance/app/last_update.txt')
-
-if os.path.exists("IRM-performance/app/last_update.txt"):
-    with open("IRM-performance/app/last_update.txt", 'r') as f:
+if os.path.exists("last_update.txt"):
+    with open("last_update.txt", 'r') as f:
         last_update = float(f.read().strip())
 else:
     last_update = 0
@@ -21,13 +19,13 @@ else:
 current_time = time.time()
 if current_time - last_update > 86400:  # 24 hours in seconds
     df_all = load_df_all_protocols()
-    df_all.to_csv('IRM-performance/app/df_all.csv', index=False)
+    df_all.to_csv('df_all.csv', index=False)
 
-    with open("IRM-performance/app/last_update.txt", 'w') as f:
+    with open("last_update.txt", 'w') as f:
         f.write(str(current_time))
 
 else:
-    df_all = pd.read_csv('IRM-performance/app/df_all.csv')
+    df_all = pd.read_csv('df_all.csv')
 
 results = compute_metrics(df_all).sort_values('market')
 
