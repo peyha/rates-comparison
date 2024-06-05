@@ -5,12 +5,22 @@ from aave_data import load_df_aave
 from compound_data import load_df_compound
 
 def load_df_all_protocols():
+
+    print("Fetching blue data...")
     df_blue = load_df_blue()
+    print("Blue data fetched!")
+
+    print("Now fetching Compound data...")
     df_compound = load_df_compound()
+    print("Compound data fetched!")
+
     loan_assets = df_blue['loan_asset'].unique()
     relevant_markets = [f"Aave Ethereum {asset}" for asset in loan_assets]
     # relevant_markets = ["Aave Ethereum DAI", "Aave Ethereum USDC", "Aave Ethereum WETH", "Aave Ethereum USDT", "Aave Ethereum USDA", "Aave Ethereum PYUSD", "Aave Ethereum crvUSD", "Aave Ethereum WBTC"]
+
+    print("Now fetching Aave data...")
     df_aave = load_df_aave(relevant_markets)
+    print("Aave data fetched!")
 
     columns = ['date', 'protocol', 'market', 'loan_asset', 'supplyApy', 'borrowApy', 'rate_at_target', 'utilization', 'totalSupplyUSD', 'totalBorrowUSD']
     df_aave['rate_at_target'] = np.nan

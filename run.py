@@ -18,7 +18,10 @@ else:
 
 current_time = time.time()
 if current_time - last_update > 86400:  # 24 hours in seconds
+    print('updating data... This can take a few minutes')
     df_all = load_df_all_protocols()
+    print("Data process completed!")
+
     df_all.to_csv('df_all.csv', index=False)
 
     with open("last_update.txt", 'w') as f:
