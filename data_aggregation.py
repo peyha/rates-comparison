@@ -66,8 +66,10 @@ def load_df_all_protocols():
     df_all['utilization_target'] = df_all.apply(get_utilization_target, axis=1)
 
     df_all = df_all.sort_values(by=['market', 'date'])
-    df_all['daily_rolling_avg'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(24, center=True).mean())
-    df_all['weekly_rolling_avg'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(7*24, center=True).mean())
+    df_all['borrowApy_daily'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(24, center=True).mean())
+    df_all['borrowApy_weekly'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(7*24, center=True).mean())
+    df_all['utilization_daily'] = df_all.groupby('market')['utilization'].transform(lambda x: x.rolling(24, center=True).mean())
+    df_all['utilization_weekly'] = df_all.groupby('market')['utilization'].transform(lambda x: x.rolling(7*24, center=True).mean())
 
     df_all = df_all.dropna(subset=[col for col in df_all.columns if col != 'rate_at_target'])
 

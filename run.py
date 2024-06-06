@@ -15,7 +15,7 @@ else:
     last_update = 0
 
 current_time = time.time()
-if current_time - last_update > 86400:  # 24 hours in seconds
+if current_time - last_update > 172_800:  # 48 hours in seconds
     print('updating data... This can take a few minutes')
     df_all = load_df_all_protocols()
     print("Data process completed!")
@@ -41,9 +41,20 @@ loan_asset = st.selectbox(
 
 # Dropdown for rate type selection
 rate_type = st.selectbox(
-    'Select a rate type',
-    ['borrowApy', 'daily_rolling_avg', 'weekly_rolling_avg']
+    'Select a rolling window',
+    ['hourly rolling avg', 'daily rolling avg', 'weekly rolling avg']
 )
+
+dict_rate_type = {
+    'hourly rolling avg': 'borrowApy',
+    'daily rolling avg': 'borrowApy_daily',
+    'weekly rolling avg': 'borrowApy_weekly'
+}
+dic_utilization_type = {
+    'hourly rolling avg': 'utilization',
+    'daily rolling avg': 'utilization_daily',
+    'weekly rolling avg': 'utilization_weekly'
+}
 
 # Input for minimum total supply USD
 min_totalSupplyUSD = st.slider('Minimum Total Supply USD', min_value=0, max_value=100_000_000, value=0, step=1_000_000)
@@ -64,7 +75,7 @@ tab = st.selectbox(
 )
 
 # Function to update graphs
-def update_graphs(selected_loan_asset, selected_markets, borrow_rate_type):
+def update_graphs(selected_loan_asset, selected_markets, rolling_window):
     traces_utilization = []
     traces_borrow_rate = []
     traces_rate_at_target = []
@@ -83,9 +94,10 @@ def update_graphs(selected_loan_asset, selected_markets, borrow_rate_type):
         for market in unique_markets:
             market_data = filtered_df[filtered_df['market'] == market]
             color = color_map[market]
-            traces_utilization.append(go.Scatter(x=market_data['date'], y=market_data['utilization'], mode='lines', name=f'{market}', line=dict(color=color)))
-            if borrow_rate_type:
-                traces_borrow_rate.append(go.Scatter(x=market_data['date'], y=market_data[borrow_rate_type], mode='lines', name=f'{market}', line=dict(color=color)))
+            if rolling_window:
+                traces_borrow_rate.append(go.Scatter(x=market_data['date'], y=market_data[dict_rate_type[rolling_window]], mode='lines', name=f'{market}', line=dict(color=color)))
+                traces_utilization.append(go.Scatter(x=market_data['date'], y=market_data[dic_utilization_type[rolling_window]], mode='lines', name=f'{market}', line=dict(color=color)))
+
             if market_data['protocol'].iloc[0] == 'Blue':
                 traces_rate_at_target.append(go.Scatter(x=market_data['date'], y=market_data['rate_at_target'], mode='lines', name=f'{market}', line=dict(color=color)))
 
