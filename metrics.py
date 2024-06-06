@@ -28,7 +28,7 @@ def IAE_negative(U, u_target):
     return error
 
 def volatility(dataframe, column):
-    return dataframe[column].pct_change().std()*((252*24*6)**0.5)
+    return dataframe[column].pct_change().std()*((252*24)**0.5)
 
 def inside_spread(r, U, r_B, r_D):
     mask = (r < r_B) & (r*U > r_D)

@@ -45,8 +45,12 @@ rate_type = st.selectbox(
     ['borrowApy', 'daily_rolling_avg', 'weekly_rolling_avg']
 )
 
-# Multiselect for market selection
-markets = df_all[df_all['loan_asset'] == loan_asset]['market'].unique()
+# Input for minimum total supply USD
+min_totalsupplyUSD = st.slider('Minimum Total Supply USD', min_value=0, max_value=int(df_all['totalsupplyUSD'].max()), value=0)
+# Filter markets by minimum total supply USD
+filtered_markets_df = df_all[(df_all['loan_asset'] == loan_asset) & (df_all['totalsupplyUSD'] > min_totalsupplyUSD)]
+markets = filtered_markets_df['market'].unique()
+
 selected_markets = st.multiselect(
     'Select markets',
     markets,
