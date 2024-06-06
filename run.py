@@ -46,9 +46,9 @@ rate_type = st.selectbox(
 )
 
 # Input for minimum total supply USD
-min_totalsupplyUSD = st.slider('Minimum Total Supply USD', min_value=0, max_value=int(df_all['totalsupplyUSD'].max()), value=0)
+min_totalSupplyUSD = st.slider('Minimum Total Supply USD', min_value=0, max_value=int(df_all['totalSupplyUSD'].max()), value=0)
 # Filter markets by minimum total supply USD
-filtered_markets_df = df_all[(df_all['loan_asset'] == loan_asset) & (df_all['totalsupplyUSD'] > min_totalsupplyUSD)]
+filtered_markets_df = df_all[(df_all['loan_asset'] == loan_asset) & (df_all['totalSupplyUSD'] > min_totalSupplyUSD)]
 markets = filtered_markets_df['market'].unique()
 
 selected_markets = st.multiselect(

@@ -11,7 +11,7 @@ def load_df_blue():
                         first: 100
                         skip: 0
                         orderBy: SupplyAssetsUsd
-                        where: {{ supplyAssetsUsd_gte: 100000 }}
+                        where: {{ supplyAssetsUsd_gte: 1000000 }}
                 ){{
                         items{{
                                 uniqueKey
@@ -143,7 +143,23 @@ def load_df_blue():
                 lambda row: row['market'] + ' ' + row['market_id'][:5] if len(df_blue[df_blue['market'] == row['market']]['market_id'].unique()) > 1 else row['market'], axis=1
         )
 
-        df_blue['rate_at_target'] = df_blue['rate_at_target'].replace(0, pd.NA).ffill()
-        df_blue['borrowApy'] = df_blue['borrowApy'].replace(0, pd.NA).ffill()
+        df_blue = df_blue.sort_values(by=['market', 'date'])
+
+        # Remove rows with initial zeros for borrowApy until the first positive value within each market
+        def remove_initial_zeros(group):
+                first_positive_idx = group[group['borrowApy'] > 0].index.min()
+                if pd.notna(first_positive_idx):
+                        return group.loc[first_positive_idx:]
+                return group
+
+        df_blue = df_blue.groupby('market').apply(remove_initial_zeros).reset_index(drop=True)
+        zero_counts = df_blue.apply(lambda x: (x == 0).sum())
+
+        print("Number of zeros per column:")
+        print(zero_counts)
+
+        # Replace zero values with the previous valid value using forward fill within each market group
+        df_blue['rate_at_target'] = df_blue.groupby('market')['rate_at_target'].apply(lambda x: x.replace(0, method='ffill'))
+        df_blue['borrowApy'] = df_blue.groupby('market')['borrowApy'].apply(lambda x: x.replace(0, method='ffill'))
 
         return df_blue
