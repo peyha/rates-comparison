@@ -11,7 +11,7 @@ def load_df_blue():
                         first: 100
                         skip: 0
                         orderBy: SupplyAssetsUsd
-                        where: {{ supplyAssetsUsd_gte: 1000000 }}
+                        where: {{ supplyAssetsUsd_gte: 100000 }}
                 ){{
                         items{{
                                 uniqueKey
