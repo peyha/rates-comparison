@@ -123,11 +123,11 @@ def update_table(selected_loan_asset, selected_markets):
     return filtered_df.drop('loan_asset', axis=1).to_dict('records')
 
 # Function to update heatmap
-def update_heatmap(selected_loan_asset, selected_rate_type, selected_markets):
-    if selected_loan_asset and selected_rate_type and selected_markets:
+def update_heatmap(selected_loan_asset, rolling_window, selected_markets):
+    if selected_loan_asset and rolling_window and selected_markets:
         filtered_df = df_all[(df_all['loan_asset'] == selected_loan_asset) & (df_all['market'].isin(selected_markets))]
-        aggregated_df = filtered_df.groupby(['date', 'market'])[selected_rate_type].mean().reset_index()    
-        pivot_df = aggregated_df.pivot(index='date', columns='market', values=selected_rate_type)
+        aggregated_df = filtered_df.groupby(['date', 'market'])[dict_rate_type[rolling_window]].mean().reset_index()    
+        pivot_df = aggregated_df.pivot(index='date', columns='market', values=dict_rate_type[rolling_window])
         pivot_df = pivot_df.fillna(method='ffill')
 
         def pairwise_corr(df):
@@ -150,7 +150,7 @@ def update_heatmap(selected_loan_asset, selected_rate_type, selected_markets):
             zmin=-1,
             zmax=1
         )
-        fig.update_layout(title=f'{selected_rate_type.replace("_", " ").title()} Correlation Heatmap for {selected_loan_asset}')
+        fig.update_layout(title=f'{rolling_window.replace("_", " ").title()} Correlation Heatmap for {selected_loan_asset}')
     else:
         fig = go.Figure()
         fig.update_layout(title='Select a loan asset, rate type, and markets to see the correlation heatmap')
