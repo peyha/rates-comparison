@@ -50,7 +50,7 @@ def weighted_average_rate(dataframe):
     return weighted_avg_borrow_rate
 
 def compute_metrics(df):
-    metrics_columns = ['avg utilization', , 'avg borrow rate', 'IAE', 'ISE', 'Liquidity', 'ISE_positive', 'IAE_negative', 'utilization volatility', 'rate volatility']
+    metrics_columns = ['avg utilization', 'avg borrow rate', 'IAE', 'ISE', 'Liquidity', 'ISE_positive', 'IAE_negative', 'utilization volatility', 'rate volatility']
 
     results_df = pd.DataFrame(columns=['market', 'loan_asset', 'utilization_target'] + metrics_columns)
     markets = df['market'].unique()
