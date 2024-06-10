@@ -50,7 +50,7 @@ def weighted_average_rate(dataframe):
     return weighted_avg_borrow_rate
 
 def compute_metrics(df):
-    metrics_columns = ['avg utilization', 'IAE', 'ISE', 'Liquidity', 'ISE_positive', 'IAE_negative', 'volatility', 'avg borrow rate']
+    metrics_columns = ['avg utilization', , 'avg borrow rate', 'IAE', 'ISE', 'Liquidity', 'ISE_positive', 'IAE_negative', 'utilization volatility', 'rate volatility']
 
     results_df = pd.DataFrame(columns=['market', 'loan_asset', 'utilization_target'] + metrics_columns)
     markets = df['market'].unique()
@@ -70,9 +70,10 @@ def compute_metrics(df):
                 'Liquidity': round(liquidity(U), 3),
                 'ISE_positive': round(ISE_positive(U, u_target), 3),
                 'IAE_negative': round(IAE_negative(U, u_target), 3),
-                'volatility': round(volatility(market_data, 'borrowApy'), 3),
+                'rate volatility': round(volatility(market_data, 'borrowApy'), 3),
                 'avg borrow rate': round(average_rate(market_data), 3),
-                'avg utilization': round(average_utilization(U), 3)
+                'avg utilization': round(average_utilization(U), 3), 
+                'utilization volatility': round(volatility(market_data, 'utilization'), 3)
             }
         except Exception as e:
             print("An error occurred:", e)
