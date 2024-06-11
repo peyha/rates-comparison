@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import os
 import time
 from metrics import *
+from scipy.stats import pearsonr
 from data_aggregation import load_df_all_protocols
 
 if os.path.exists("last_update.txt"):
@@ -123,6 +124,23 @@ def update_table(selected_loan_asset, selected_markets):
     return filtered_df.drop('loan_asset', axis=1).to_dict('records')
 
 # Function to update heatmap
+def pairwise_corr_with_pvalues(df):
+    corr_matrix = pd.DataFrame(index=df.columns, columns=df.columns)
+    pvalue_matrix = pd.DataFrame(index=df.columns, columns=df.columns)
+    
+    for col1 in df.columns:
+        for col2 in df.columns:
+            valid_idx = df[[col1, col2]].dropna().index
+            if len(valid_idx) > 1:  # Ensure there are at least 2 valid points
+                corr, pvalue = pearsonr(df.loc[valid_idx, col1], df.loc[valid_idx, col2])
+                corr_matrix.at[col1, col2] = corr
+                pvalue_matrix.at[col1, col2] = pvalue
+            else:
+                corr_matrix.at[col1, col2] = np.nan
+                pvalue_matrix.at[col1, col2] = np.nan
+                
+    return corr_matrix, pvalue_matrix
+
 def update_heatmap(selected_loan_asset, rolling_window, selected_markets):
     if selected_loan_asset and rolling_window and selected_markets:
         filtered_df = df_all[(df_all['loan_asset'] == selected_loan_asset) & (df_all['market'].isin(selected_markets))]
@@ -130,33 +148,33 @@ def update_heatmap(selected_loan_asset, rolling_window, selected_markets):
         pivot_df = aggregated_df.pivot(index='date', columns='market', values=dict_rate_type[rolling_window])
         pivot_df = pivot_df.fillna(method='ffill')
 
-        def pairwise_corr(df):
-            corr_matrix = pd.DataFrame(index=df.columns, columns=df.columns)
-            for col1 in df.columns:
-                for col2 in df.columns:
-                    valid_idx = df[[col1, col2]].dropna().index
-                    if len(valid_idx) > 1:  # Ensure there are at least 2 valid points
-                        corr_matrix.at[col1, col2] = df.loc[valid_idx, col1].corr(df.loc[valid_idx, col2])
-                    else:
-                        corr_matrix.at[col1, col2] = np.nan
-            return corr_matrix
+        correlation_matrix, pvalue_matrix = pairwise_corr_with_pvalues(pivot_df)
 
-        correlation_matrix = pairwise_corr(pivot_df)
+        # Create a combined matrix of correlation and p-values as strings
+        combined_matrix = correlation_matrix.astype(str) + "<br>P-value: " + pvalue_matrix.astype(str)
+
         fig = px.imshow(
-            correlation_matrix,
+            correlation_matrix.astype(float),
             text_auto=True,
             aspect="auto",
             color_continuous_scale=px.colors.sequential.RdBu[::-1],
             zmin=-1,
             zmax=1
         )
-        fig.update_layout(title=f'{rolling_window.replace("_", " ").title()} Correlation Heatmap for {selected_loan_asset}')
+        
+        # Update annotations with combined values
+        fig.update_traces(
+            text=combined_matrix.values,
+            texttemplate="%{text}",
+            hovertemplate="%{text}<extra></extra>"
+        )
+        
+        fig.update_layout(title=f'{rolling_window.replace("_", " ").title()} Correlation Heatmap with P-values for {selected_loan_asset}')
     else:
         fig = go.Figure()
         fig.update_layout(title='Select a loan asset, rate type, and markets to see the correlation heatmap')
 
     return fig
-
 # Render content based on the selected tab
 if tab == 'Graphs':
     if loan_asset and selected_markets and rate_type:
