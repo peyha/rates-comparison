@@ -151,7 +151,7 @@ def update_heatmap(selected_loan_asset, rolling_window, selected_markets):
         correlation_matrix, pvalue_matrix = pairwise_corr_with_pvalues(pivot_df)
 
         # Create a combined matrix of correlation and p-values as strings
-        combined_matrix = correlation_matrix.astype(str) + "<br>P-value: " + pvalue_matrix.astype(str)
+        combined_matrix = correlation_matrix.astype(str)
 
         fig = px.imshow(
             correlation_matrix.astype(float),
@@ -169,7 +169,7 @@ def update_heatmap(selected_loan_asset, rolling_window, selected_markets):
             hovertemplate="%{text}<extra></extra>"
         )
         
-        fig.update_layout(title=f'{rolling_window.replace("_", " ").title()} Correlation Heatmap with P-values for {selected_loan_asset}')
+        fig.update_layout(title=f'{rolling_window.replace("_", " ").title()} Correlation Heatmap for {selected_loan_asset}')
     else:
         fig = go.Figure()
         fig.update_layout(title='Select a loan asset, rate type, and markets to see the correlation heatmap')
