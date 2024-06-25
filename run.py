@@ -3,29 +3,8 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import os
-import time
 from metrics import *
 from scipy.stats import pearsonr
-from data_aggregation import load_df_all_protocols
-
-if __name__ == '__main__':
-    if os.path.exists("last_update.txt"):
-        with open("last_update.txt", 'r') as f:
-            last_update = float(f.read().strip())
-    else:
-        last_update = 0
-
-    current_time = time.time()
-    if current_time - last_update > 172_800:  # 48 hours in seconds
-        print('updating data... This can take a few minutes')
-        df_all = load_df_all_protocols()
-        print("Data process completed!")
-
-        df_all.to_csv('df_all.csv', index=False)
-
-        with open("last_update.txt", 'w') as f:
-            f.write(str(current_time))
 
 df_all = pd.read_csv('df_all.csv')
 

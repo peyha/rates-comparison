@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import os
+import time
 from blue_data import load_df_blue
 from aave_data import load_df_aave
 from compound_data import load_df_compound
@@ -74,3 +76,21 @@ def load_df_all_protocols():
     df_all = df_all.dropna(subset=[col for col in df_all.columns if col != 'rate_at_target'])
 
     return df_all
+
+if __name__ == '__main__':
+    if os.path.exists("last_update.txt"):
+        with open("last_update.txt", 'r') as f:
+            last_update = float(f.read().strip())
+    else:
+        last_update = 0
+
+    current_time = time.time()
+    if current_time - last_update > 172_800:  # 48 hours in seconds
+        print('updating data... This can take a few minutes')
+        df_all = load_df_all_protocols()
+        print("Data process completed!")
+
+        df_all.to_csv('df_all.csv', index=False)
+
+        with open("last_update.txt", 'w') as f:
+            f.write(str(current_time))
