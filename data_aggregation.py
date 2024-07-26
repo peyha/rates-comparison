@@ -6,6 +6,7 @@ from blue_data import load_df_blue
 from aave_data import load_df_aave
 from compound_data import load_df_compound
 
+
 def load_df_all_protocols():
 
     print("Fetching blue data...")
@@ -24,7 +25,8 @@ def load_df_all_protocols():
     df_aave = load_df_aave(relevant_markets)
     print("Aave data fetched!")
 
-    columns = ['date', 'protocol', 'market', 'loan_asset', 'supplyApy', 'borrowApy', 'rate_at_target', 'utilization', 'totalSupplyUSD', 'totalBorrowUSD']
+    columns = ['date', 'protocol', 'market', 'loan_asset', 'supplyApy', 'borrowApy',
+               'rate_at_target', 'utilization', 'totalSupplyUSD', 'totalBorrowUSD']
     df_aave['rate_at_target'] = np.nan
     df_compound['rate_at_target'] = np.nan
     df_aave['protocol'] = 'Aave'
@@ -32,7 +34,8 @@ def load_df_all_protocols():
     df_compound['protocol'] = 'Compound'
     df_compound['market'] = df_compound['loan_asset'] + ' - Compound'
     df_blue['protocol'] = 'Blue'
-    df_all = pd.concat([df_aave[columns], df_compound[columns], df_blue[columns]])
+    df_all = pd.concat(
+        [df_aave[columns], df_compound[columns], df_blue[columns]])
 
     # df_all = df_all[df_all.loan_asset.isin(df_blue['loan_asset'].unique())]
 
@@ -68,14 +71,24 @@ def load_df_all_protocols():
     df_all['utilization_target'] = df_all.apply(get_utilization_target, axis=1)
 
     df_all = df_all.sort_values(by=['market', 'date'])
-    df_all['borrowApy_daily'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(24, center=True).mean())
-    df_all['borrowApy_weekly'] = df_all.groupby('market')['borrowApy'].transform(lambda x: x.rolling(7*24, center=True).mean())
-    df_all['utilization_daily'] = df_all.groupby('market')['utilization'].transform(lambda x: x.rolling(24, center=True).mean())
-    df_all['utilization_weekly'] = df_all.groupby('market')['utilization'].transform(lambda x: x.rolling(7*24, center=True).mean())
+    df_all['borrowApy_daily'] = df_all.groupby('market')['borrowApy'].transform(
+        lambda x: x.rolling(24, center=True).mean())
+    df_all['borrowApy_weekly'] = df_all.groupby('market')['borrowApy'].transform(
+        lambda x: x.rolling(7*24, center=True).mean())
+    df_all['utilization_daily'] = df_all.groupby('market')['utilization'].transform(
+        lambda x: x.rolling(24, center=True).mean())
+    df_all['utilization_weekly'] = df_all.groupby('market')['utilization'].transform(
+        lambda x: x.rolling(7*24, center=True).mean())
+    df_all['supplyApy_daily'] = df_all.groupby('market')['supplyApy'].transform(
+        lambda x: x.rolling(24, center=True).mean())
+    df_all['supplyApy_weekly'] = df_all.groupby('market')['supplyApy'].transform(
+        lambda x: x.rolling(7*24, center=True).mean())
 
-    df_all = df_all.dropna(subset=[col for col in df_all.columns if col != 'rate_at_target'])
+    df_all = df_all.dropna(
+        subset=[col for col in df_all.columns if col != 'rate_at_target'])
 
     return df_all
+
 
 if __name__ == '__main__':
     if os.path.exists("last_update.txt"):
