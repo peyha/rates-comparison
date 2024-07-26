@@ -35,6 +35,11 @@ dic_utilization_type = {
     'daily rolling avg': 'utilization_daily',
     'weekly rolling avg': 'utilization_weekly'
 }
+dict_supply_rate_type = {
+    'hourly rolling avg': 'supplyApy',
+    'daily rolling avg': 'supplyApy_daily',
+    'weekly rolling avg': 'supplyApy_weekly'
+}
 
 # Input for minimum total supply USD
 min_totalSupplyUSD = st.slider(
@@ -82,7 +87,7 @@ def update_graphs(selected_loan_asset, selected_markets, rolling_window):
             color = color_map[market]
             if rolling_window:
                 traces_supply_rate.append(go.Scatter(
-                    x=market_data['date'], y=market_data['supplyApy'], mode='lines', name=f'{market}', line=dict(color=color)))
+                    x=market_data['date'], y=market_data[dict_supply_rate_type[rolling_window]], mode='lines', name=f'{market}', line=dict(color=color)))
                 traces_borrow_rate.append(go.Scatter(
                     x=market_data['date'], y=market_data[dict_borrow_rate_type[rolling_window]], mode='lines', name=f'{market}', line=dict(color=color)))
                 traces_utilization.append(go.Scatter(
