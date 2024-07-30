@@ -1,8 +1,10 @@
 import requests
 import pandas as pd
+import os
 
 
 def load_df_aave(relevant_markets):
+    api_key = os.environ['THE_GRAPH_API_KEY']
     market_tx = """
   query MyQuery($hour: Int, $id: String, $marketNames: [String!]) {
     marketHourlySnapshots(where: {hours_gte: $hour, id_gte: $id, market_: {name_in: $marketNames}}, first: 1000) {
@@ -21,7 +23,9 @@ def load_df_aave(relevant_markets):
     }
   }"""
 
-    url = "https://api.thegraph.com/subgraphs/name/messari/aave-v3-ethereum"
+    url = "https://gateway-arbitrum.network.thegraph.com/api/" + api_key + \
+        "/subgraphs/id/JCNWRypm7FYwV8fx5HhzZPSFaMxgkPuw4TnR3Gpi81zk"
+
     blue_launch_timestamp = 1704927599
     hour = blue_launch_timestamp // 3600
     last_id = ""
