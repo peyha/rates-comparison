@@ -1,9 +1,11 @@
 import requests
 import pandas as pd
 import numpy as np
+import os
 
 
 def load_df_compound():
+    api_key = os.environ['THE_GRAPH_API_KEY']
     market_tx = """
   query MyQuery($hour: Int, $id: String) {
     marketHourlySnapshots(where: {hours_gte: $hour, id_gte: $id}, first: 1000) {
@@ -23,7 +25,8 @@ def load_df_compound():
   }"""
 
     blue_launch_timestamp = 1704927599
-    url = "https://api.thegraph.com/subgraphs/name/messari/compound-v3-ethereum"
+    url = "https://gateway-arbitrum.network.thegraph.com/api/" + api_key + \
+        "/subgraphs/id/AwoxEZbiWLvv6e3QdvdMZw4WDURdGbvPfHmZRc8Dpfz9"
     hour = blue_launch_timestamp // 3600
     last_id = ""
     market_data = []
@@ -31,7 +34,6 @@ def load_df_compound():
     while True:
         res = requests.post(url, json={"query": market_tx, "variables": {
                             "hour": hour, "id": last_id}})
-        print(res.status_code)
         markets = res.json()["data"]["marketHourlySnapshots"]
 
         for market in markets:
