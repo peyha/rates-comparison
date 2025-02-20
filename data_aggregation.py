@@ -36,7 +36,7 @@ def load_df_all_protocols():
     df_blue['protocol'] = 'Blue'
     df_all = pd.concat(
         [df_aave[columns], df_compound[columns], df_blue[columns]])
-
+    print(df_all['protocol'].unique())
     # df_all = df_all[df_all.loan_asset.isin(df_blue['loan_asset'].unique())]
 
     # # Filter based on the launch date and the minimum date for each loan asset
@@ -84,8 +84,8 @@ def load_df_all_protocols():
     df_all['supplyApy_weekly'] = df_all.groupby('market')['supplyApy'].transform(
         lambda x: x.rolling(7*24, center=True).mean())
 
-    df_all = df_all.dropna(
-        subset=[col for col in df_all.columns if col != 'rate_at_target'])
+    # df_all = df_all.dropna(
+    #    subset=[col for col in df_all.columns if col != 'rate_at_target'])
 
     return df_all
 
